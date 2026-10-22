@@ -3,6 +3,17 @@
 This repository contains the implementation and experiments for the paper
 [*Correcting Boundary Bias and Observation Independence in Bayesian Experimental Design*](https://arxiv.org/abs/2602.01898).
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/demo_dark.gif">
+  <img src="assets/demo_light.gif" width="100%"
+       alt="Sequential design on the Gramacy-Lee function with EIG and with the proposed method, and the reconstruction error over 80 rounds.">
+</picture>
+
+Sequential design on the Gramacy–Lee function, starting from the same initial design (hollow
+circles). EIG spreads its measurements over the whole domain, including the boundary. The
+proposed method concentrates them where the function varies and reaches a lower reconstruction
+error.
+
 ## Overview
 
 For a Gaussian process with fixed hyperparameters, the posterior variance depends on where

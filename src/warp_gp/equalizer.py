@@ -2,12 +2,17 @@
 variance averaged over scrambled Sobol designs of size N. Reflections and permutations of the
 cube are used to reduce the Monte Carlo variance.
 """
+import hashlib
 import itertools
+import os
 
 import numpy as np
 import torch
 
 from .gp import DT, matern52
+
+TABLES = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "equalizer"))
 
 
 def _k(A, B, ell):
@@ -34,7 +39,8 @@ def geometric_equalizer(C, n, D, ell, noise, S=None, SYM=16):
 
 class EqualizerTable:
     """Geometric equalizer tabulated on the sorted coordinates min(x, 1 - x) and interpolated
-    multilinearly. The table is rebuilt when N has grown by 10%."""
+    multilinearly. The table is rebuilt when N has grown by 10%. Precomputed tables in
+    data/equalizer/ are used when they match D, ell, noise and S; otherwise they are computed."""
 
     LEVELS = (0.0, 0.0125, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.3, 0.5)
 
@@ -42,18 +48,33 @@ class EqualizerTable:
         self.D, self.ell, self.noise, self.S = D, ell, noise, S
         self.lev = torch.tensor(self.LEVELS)
         self.n = None
+        key = hashlib.sha1(repr((D, ell, noise, S)).encode()).hexdigest()[:12]
+        self.path = os.path.join(TABLES, f"D{D}_{key}.npz")
+        self.cache = dict(np.load(self.path)) if os.path.exists(self.path) else {}
 
     def _build(self, n):
         D, L = self.D, len(self.lev)
         idx = np.array(list(itertools.combinations_with_replacement(range(L), D)))
-        g = geometric_equalizer(self.lev[torch.as_tensor(idx)], n, D, self.ell, self.noise, S=self.S)
+        if f"n{n}" not in self.cache:
+            self.cache[f"n{n}"] = geometric_equalizer(
+                self.lev[torch.as_tensor(idx)], n, D, self.ell, self.noise, S=self.S).numpy()
+        g = self.cache[f"n{n}"]
         grid = np.stack(np.meshgrid(*[np.arange(L)] * D, indexing="ij"), -1).reshape(-1, D)
         poly = L ** np.arange(D)[::-1]
         keys = idx @ poly
         order = np.argsort(keys)
         pos = np.searchsorted(keys[order], np.sort(grid, 1) @ poly)
-        self.G = torch.as_tensor(g.numpy()[order[pos]])
+        self.G = torch.as_tensor(g[order[pos]])
         self.n = n
+
+    def precompute(self, n0, n_max):
+        """Compute the tables for all design sizes reached from n0 to n_max and save them."""
+        n = n0
+        while n <= n_max:
+            self._build(n)
+            n = next(m for m in range(n, 2 * n + 2) if m >= 1.1 * n)
+        os.makedirs(TABLES, exist_ok=True)
+        np.savez(self.path, **self.cache)
 
     def __call__(self, C, n):
         if self.n is None or n >= 1.1 * self.n:

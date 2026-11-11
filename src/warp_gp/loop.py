@@ -8,6 +8,7 @@ from .equalizer import EqualizerTable
 
 N0 = {2: 20, 3: 40, 4: 60, 5: 80, 6: 100}
 NCAND = {2: 2048, 3: 4096, 4: 8192, 5: 16384, 6: 32768}
+TABLE_NOISE = 0.05 ** 2  # the benchmark noise level (5% of the standard deviation), shared by all tables
 
 
 def sobol(D, n, seed):
@@ -33,7 +34,7 @@ def run(func_name, seed, method, rounds=200, ncand=None, table=False):
     """Run one method and return the initial design, the selected points and their observations."""
     fn, D, noise, X0, y0, C = setup(func_name, seed, ncand)
     ell = default_lengthscale(D)
-    g = EqualizerTable(D, ell, noise) if table else None
+    g = EqualizerTable(D, ell, TABLE_NOISE) if table else None
     gen = torch.Generator().manual_seed(8000 + seed)
     X, y = X0, y0
     for _ in range(rounds):

@@ -88,6 +88,10 @@ The benchmarks are defined on `[0,1]^D` and run for 200 rounds by default.
 of a GP fitted to the UCI Combined Cycle Power Plant and Airfoil Self-Noise datasets
 (CC BY 4.0), stored in `data/`.
 
+On the real-data benchmarks the geometric equalizer is evaluated from tables. Tables for all
+benchmark settings are precomputed in `data/equalizer/` (`experiments/precompute_tables.py`); for
+other settings they are computed automatically during acquisition.
+
 ### Sphere
 
 The spheres S² and S³ have no boundary and therefore isolate the effect of observation
@@ -109,9 +113,9 @@ src/warp_gp/
   functions.py     benchmark functions
   uci.py           real-data benchmarks
   evaluate.py      nearest-neighbour reconstruction error
-experiments/       run.py and table.py
+experiments/       run.py, table.py and precompute_tables.py
 notebooks/         demo.ipynb
-data/              GP surrogates of the UCI datasets
+data/              GP surrogates of the UCI datasets and precomputed equalizer tables
 ```
 
 ## Citation

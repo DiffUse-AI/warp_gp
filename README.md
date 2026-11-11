@@ -1,7 +1,7 @@
 # Correcting Boundary Bias and Observation Independence in Bayesian Experimental Design
 
-This repository contains the implementation and experiments for the paper
-[*Correcting Boundary Bias and Observation Independence in Bayesian Experimental Design*](https://arxiv.org/abs/2602.01898).
+<!--This repository contains the implementation and experiments for the paper
+[*Correcting Boundary Bias and Observation Independence in Bayesian Experimental Design*](https://arxiv.org/abs/2602.01898).-->
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/demo_dark.gif">
@@ -118,7 +118,7 @@ notebooks/         demo.ipynb
 data/              GP surrogates of the UCI datasets and precomputed equalizer tables
 ```
 
-## Citation
+<!-- ## Citation
 
 ```bibtex
 @article{jarl2026correcting,
@@ -127,7 +127,7 @@ data/              GP surrogates of the UCI datasets and precomputed equalizer t
   journal = {arXiv preprint arXiv:2602.01898},
   year    = {2026}
 }
-```
+```-->
 
 ## License
 

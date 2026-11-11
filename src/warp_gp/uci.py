@@ -21,4 +21,4 @@ def _surrogate(name):
     return f
 
 
-UCI = {"power_plant": 4, "airfoil": 5}
+UCI = {"power_plant": 4, "airfoil": 5, "IA": 2, "IB": 2, "mdot": 2, "liver": 5}

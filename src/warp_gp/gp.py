@@ -61,3 +61,8 @@ def log_marginal_likelihood(X, y, noise, ell, warp=None):
     L = torch.linalg.cholesky(kernel(X, X, ell, warp) + noise * torch.eye(n))
     a = torch.cholesky_solve(y[:, None], L).squeeze(-1)
     return (-0.5 * (y * a).sum() - L.diagonal().log().sum() - 0.5 * n * math.log(2 * math.pi)) / n
+
+
+def gsy_gp_scores(X, y, U, noise, ell):
+    mu_U = posterior_mean(X, y, U, noise, ell)   # f(x_n) for pool candidates
+    return (mu_U[:, None] - y[None, :]).abs().min(dim=1).values

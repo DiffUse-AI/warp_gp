@@ -5,6 +5,7 @@ from .acquisition import score
 from .functions import get_function, standardized
 from .gp import DT, default_lengthscale
 from .equalizer import EqualizerTable
+from .lola_voronoi import lola_pick
 
 N0 = {2: 20, 3: 40, 4: 60, 5: 80, 6: 100}
 NCAND = {2: 2048, 3: 4096, 4: 8192, 5: 16384, 6: 32768}
@@ -40,6 +41,8 @@ def run(func_name, seed, method, rounds=200, ncand=None, table=False):
     for _ in range(rounds):
         if method == "fps":
             i = torch.cdist(C, X).min(1).values.argmax()
+        elif method == "lola":
+            i = lola_pick(X, y, C)
         else:
             i = score(method, X, y, C, noise, ell, g).argmax()
         x = C[int(i)][None]
